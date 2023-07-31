@@ -4,6 +4,8 @@ import { HiMenuAlt4 } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../hooks';
+import Cookies from "universal-cookie";
+import { logout } from '../redux/slice/userSlice';
 
 // import logo from '../../images/logo.png';
 
@@ -12,6 +14,13 @@ const Navbar = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [toggleMenu, setToggleMenu] = useState(false);
+  const cookies = new Cookies();
+  
+  const handleLogOut = () => {
+    dispatch(logout());
+    cookies.remove("userId");
+    navigate("/");
+  };
 
   return (
     <nav className="flex items-center justify-between w-full p-4 md:justify-center">
@@ -27,8 +36,9 @@ const Navbar = () => {
           </li>
         ) : (
           <li className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]">
-            {' '}
-            <Link to="/signup">Logout</Link>
+                  {' '}
+                  <button onClick={() => handleLogOut()}>Logout</button>
+            
           </li>
         )}
         {!isLoggedIn ? (
@@ -69,8 +79,9 @@ const Navbar = () => {
           </li>
         ) : (
           <li className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]">
-            {' '}
-            <Link to="/signup">Logout</Link>
+                  {' '}
+                  <button onClick={() => handleLogOut()}>Logout</button>
+            
           </li>
         )}
         {!isLoggedIn ? (

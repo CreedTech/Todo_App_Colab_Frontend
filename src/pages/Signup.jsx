@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useFormInputs } from '../hooks';
 import axios from 'axios';
 import { login } from '../redux/slice/userSlice';
+import { Navbar } from '../components';
+import Fallback from '../components/Fallback';
+import Cookies from "universal-cookie";
 
 const initialState = {
   name: '',
@@ -20,11 +23,13 @@ const Signup = () => {
   const { name, email, password } = inputs;
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const cookies = new Cookies();
+  const disabled = !inputs;
 
   const handleSubmit = async (e) => {
     console.log(inputs);
     e.preventDefault();
-    setLoading(true);
+   
     const payload = { name, email, password };
     console.log('payload');
     console.log(payload);
@@ -35,7 +40,7 @@ const Signup = () => {
     }
 
     const headers = { 'Content-Type': 'application/json' };
-
+    setLoading(true);
     try {
       const data = await axios({
         method: 'POST',
@@ -43,11 +48,14 @@ const Signup = () => {
         data: payload,
         headers,
       });
+      
       setLoading(false);
       console.log(data);
+      console.log(data.data.id);
       // const { success } = data;
       const user = { payload };
-        dispatch(login(user));
+      dispatch(login(user));
+      cookies.set("userId", data.data.id);
         setLoading(false);
         toast.success('User signed up successfully!🚀.');
         const timeout = setTimeout(() => navigate('/'), 3000);
@@ -61,7 +69,8 @@ const Signup = () => {
   };
   return (
     <>
-      {loading && <h1>Loading...</h1>}
+       <Navbar/>
+      {loading && <Fallback/>}
       <section className="bg-gray-50 dark:bg-gray-900">
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <a
@@ -134,7 +143,8 @@ const Signup = () => {
                 </div>
                 <button
                   type="submit"
-                  className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  className="w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  disabled={disabled}
                 >
                   {loading ? 'loading' : 'Signup'}
                 </button>
