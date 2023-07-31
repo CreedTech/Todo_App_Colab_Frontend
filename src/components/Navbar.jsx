@@ -24,7 +24,7 @@ const Navbar = () => {
       <div className='flex relative'>
         {toggleMenu
           ? <></>
-          : <HiMenuAlt4 fontSize={28} className='text-black md:hidden cursor-pointer' onClick={() => setToggleMenu(true)}/>
+          : <HiMenuAlt4 fontSize={28} className='text-white md:hidden cursor-pointer' onClick={() => setToggleMenu(true)}/>
         }
         {toggleMenu && (
           <ul
@@ -33,10 +33,10 @@ const Navbar = () => {
             '
           >
             <li className='text-xl w-full my-2'>
-              <AiOutlineClose className='cursor-pointer text-black' onClick={() => { setToggleMenu(false) }} />
+              <AiOutlineClose className='cursor-pointer text-hite' onClick={() => { setToggleMenu(false) }} />
             </li>
             
-                       <li className='bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]'>Sign up</li>
+            <li className='bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]'> <Link to="/signup">Sign up</Link></li>
         <li className='bg-[#ffffff] py-2 px-7 mx-4 rounded-full cursor-pointer text-black hover:bg-[#ffffff]'>Login</li>
           </ul>
         )}
