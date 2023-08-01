@@ -6,6 +6,8 @@ import { useAppDispatch } from '../hooks';
 import axios from 'axios';
 import { addTodo } from '../redux/slice/todoSlice';
 import { toast } from 'react-toastify';
+import { useState } from 'react';
+import Fallback from './Fallback';
 
 const url = 'https://todo-app-backend-n4ta.onrender.com/api/todos/';
 const initialState = {
@@ -20,12 +22,15 @@ const AddTodoPopup = () => {
   const userId = cookies.get('userId');
   const dispatch = useAppDispatch();
   const { triggerRefresh } = useContextProvider();
+  const [loading, setLoading] = useState(false);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title || !description)
       return toast.error("Please fill all fields");
     const headers = { 'Content-Type': 'application/json' };
+    setLoading(true);
     const payload = { title, description, userId };
     // setLoading(true);
     try {
@@ -36,21 +41,19 @@ const AddTodoPopup = () => {
         headers,
       });
 
-      // setLoading(false);
+      setLoading(false);
       console.log(data);
-      // console.log(data.data.id);
-      // const { success } = data;
       if (!data || data === null) return;
       dispatch(addTodo(payload));
       triggerRefresh();
       // cookies.set('userId', data.data.id);
-      // setLoading(false);
+      setLoading(false);
       handleUnclicked();
       toast.success('Data Added successfully!🚀.');
       // const timeout = setTimeout(() => navigate('/'), 1000);
       // return () => clearTimeout(timeout);
     } catch (error) {
-      // setLoading(false);
+      setLoading(false);
       // setError(error.response.data.message);
       console.log(error.response.data.message);
       toast.error(error.response.data.message);
@@ -58,6 +61,8 @@ const AddTodoPopup = () => {
     }
   };
   return (
+    <>
+      {loading && <Fallback />}
     <div onClick={() => handleUnclicked('addtodo')}>
       <div
         onClick={(e) => e.stopPropagation()}
@@ -152,40 +157,9 @@ const AddTodoPopup = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
 export default AddTodoPopup;
 
-{
-  /* <div className="relative w-1/2 bg-white rounded-md h-1/2">
-          <div className="absolute top-0 right-0 pt-2 pr-2">
-            <button
-              onClick={() => handleUnclicked('addtodo')}
-              className="text-gray-400 hover:text-gray-500 focus:outline-none"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-          <div className="p-4">
-            <h1 className="text-lg font-bold">Hello, I am a Modal</h1>
-            <p>This is the content inside the modal.</p>
-            <button onClick={() => handleUnclicked('addtodo')}>
-              Close Modal
-            </button>
-          </div>
-        </div> */
-}

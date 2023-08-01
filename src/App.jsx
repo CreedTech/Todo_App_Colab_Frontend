@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Home, Login, Signup } from './pages';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import Fallback from './components/Fallback';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { getUserTodos, login } from './redux/slice/userSlice';
@@ -27,8 +27,11 @@ function App() {
     };
     loginUser();
   }, []);
+
+  const fetchTodos = useMemo(() => dispatch(getUserTodos(userId)), []);
   useEffect(() => {
     if (userId === undefined) return;
+    fetchTodos;
     dispatch(getUserTodos(userId));
     // dispatch(getSubscribedApis(userId));
   }, [isLoggedIn === true, userId]);
