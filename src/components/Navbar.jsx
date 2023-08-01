@@ -4,10 +4,14 @@ import { HiMenuAlt4 } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../hooks';
-import Cookies from "universal-cookie";
+import Cookies from 'universal-cookie';
 import { logout } from '../redux/slice/userSlice';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 // import logo from '../../images/logo.png';
+
+const url = 'https://todo-app-backend-n4ta.onrender.com/api/users/logout';
 
 const Navbar = () => {
   const { isLoggedIn } = useAppSelector((state) => state.user);
@@ -15,18 +19,40 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [toggleMenu, setToggleMenu] = useState(false);
   const cookies = new Cookies();
-  
-  const handleLogOut = () => {
-    dispatch(logout());
-    cookies.remove("userId");
-    navigate("/");
+  // const [loading, setLoading] = useState(false);
+
+  const handleLogOut = async () => {
+    const headers = { 'Content-Type': 'application/json' };
+    // setLoading(true);
+    try {
+      const data = await axios({
+        method: 'GET',
+        url,
+        headers,
+      });
+
+      // setLoading(false);
+      console.log(data.data.message);
+      // setLoading(false);
+      dispatch(logout());
+      cookies.remove('userId');
+      navigate('/');
+      toast.success(`${data.data.message} 🚀. Bye.`);
+    } catch (error) {
+      // setLoading(false);
+      // setError(error.response.data.message);
+      console.log(error);
+      toast.error(error.data.message);
+    }
   };
 
   return (
     <nav className="flex items-center justify-between w-full p-4 md:justify-center">
       <div className="md:flex-[0.5] flex-initial justify-center items-center">
         {/* <img src={ logo} alt={logo} className='w-32 cursor-pointer' /> */}
-        <h1 className="text-white">T&L TODO</h1>
+        <Link to="/">
+          <h1 className="text-white">T&L TODO</h1>
+        </Link>
       </div>
       <ul className="flex-row items-center justify-between flex-initial hidden text-white list-none md:flex">
         {!isLoggedIn ? (
@@ -36,14 +62,13 @@ const Navbar = () => {
           </li>
         ) : (
           <li className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]">
-                  {' '}
-                  <button onClick={() => handleLogOut()}>Logout</button>
-            
+            {' '}
+            <button onClick={() => handleLogOut()}>Logout</button>
           </li>
         )}
         {!isLoggedIn ? (
           <li className="bg-[#ffffff] py-2 px-7 mx-4 rounded-full cursor-pointer text-black hover:bg-[#ffffff]">
-            Login
+            <Link to="/login">Login</Link>
           </li>
         ) : null}
       </ul>
@@ -73,22 +98,21 @@ const Navbar = () => {
             </li>
 
             {!isLoggedIn ? (
-          <li className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]">
-            {' '}
-            <Link to="/signup">Sign up</Link>
-          </li>
-        ) : (
-          <li className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]">
-                  {' '}
-                  <button onClick={() => handleLogOut()}>Logout</button>
-            
-          </li>
-        )}
-        {!isLoggedIn ? (
-          <li className="bg-[#ffffff] py-2 px-7 mx-4 rounded-full cursor-pointer text-black hover:bg-[#ffffff]">
-            Login
-          </li>
-        ) : null}
+              <li className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]">
+                {' '}
+                <Link to="/signup">Sign up</Link>
+              </li>
+            ) : (
+              <li className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]">
+                {' '}
+                <button onClick={() => handleLogOut()}>Logout</button>
+              </li>
+            )}
+            {!isLoggedIn ? (
+              <li className="bg-[#ffffff] py-2 px-7 mx-4 rounded-full cursor-pointer text-black hover:bg-[#ffffff]">
+                <Link to="/login">Login</Link>
+              </li>
+            ) : null}
           </ul>
         )}
       </div>

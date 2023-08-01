@@ -1,6 +1,6 @@
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
-import { Home, Signup } from './pages';
+import { Home, Login, Signup } from './pages';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import { Suspense, useEffect } from 'react';
@@ -8,12 +8,15 @@ import Fallback from './components/Fallback';
 import { useAppDispatch, useAppSelector } from './hooks';
 import { getUserTodos, login } from './redux/slice/userSlice';
 import Cookies from 'universal-cookie';
+import { AddTodoPopup } from './components';
+import { useContextProvider } from './contexts/ContextProvider';
 
 function App() {
   const { isLoggedIn } = useAppSelector((store) => store.user);
   const cookies = new Cookies();
   const userId = cookies.get('userId');
   const dispatch = useAppDispatch();
+  const { isClicked } = useContextProvider();
 
   useEffect(() => {
     const loginUser = () => {
@@ -37,6 +40,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
           </Routes>
         </Suspense>
 
@@ -45,6 +49,7 @@ function App() {
         {/* <Services />
     <Transactions />
     <Footer /> */}
+        {isClicked.addtodo && <AddTodoPopup />}
       </div>
     </>
   );

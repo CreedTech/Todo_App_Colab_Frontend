@@ -1,8 +1,8 @@
-import  { createContext, useState } from 'react';
+import  { createContext, useContext, useState } from 'react';
 
 const AppContext = createContext(null);
 
-const initialState = { login: false, addapi: false };
+const initialState = { login: false, addtodo: false };
 
 // ContextProvider.propTypes = {
 //   children: React.ReactNode,
@@ -40,4 +40,4 @@ export const ContextProvider = ({ children }) => {
   );
 };
 
-// export const useContextProvider = () => useContext(AppContext);
+export const useContextProvider = () => useContext(AppContext);

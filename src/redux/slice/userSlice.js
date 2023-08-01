@@ -1,18 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import Cookies from "universal-cookie";
+import Cookies from 'universal-cookie';
 
 // import { UserProfileType, APIType, SubscriptionType, SubscribedUser } from "../../types";
 
-// const core_url = import.meta.env.VITE_CORE_URL;
+const core_url = 'https://todo-app-backend-n4ta.onrender.com/api';
 // const identity_url = import.meta.env.VITE_IDENTITY_URL;
-const cookies = new Cookies()
+const cookies = new Cookies();
 const userId = cookies.get('userId');
 // const profileId = cookies.get("profileId")
 
 // interface UserState {
 //     user: UserProfileType | Object
-//     userApis: Array<APIType>
-//     subscribedApis: Array<SubscriptionType>
+//     userTodos: Array<APIType>
+//     subscribedTodos: Array<SubscriptionType>
 //     subscribedUsers: Array<SubscribedUser>
 //     loading: "idle" | "pending" | "fulfilled" | "rejected"
 //     error?
@@ -24,104 +24,94 @@ const initialState = {
   loading: 'idle',
   error: null,
   isLoggedIn: false,
-  userApis: [],
-  subscribedApis: [],
-  subscribedUsers: [],
+  userTodos: [],
+  favouriteTodos: [],
 };
 
-export const getUserProfile = createAsyncThunk(
-  'user/getprofile',
-  async (_, thunkAPI) => {
-    // const headers = { 'X-Zapi-Auth-Token': `Bearer ${cookies.get('accessToken')}` }
-    // try {
-    //     const response = await fetch(`${identity_url}/profile/${userId}`,
-    //         // { headers }
-    //     ) //sendRequest() function needs to replace this
-    //     const data = await response.json()
-    //     return data
-    // } catch (error) {
-    //     return thunkAPI.rejectWithValue(error.message)
-    // }
-  }
-);
+// export const getUserProfile = createAsyncThunk(
+//   'user/getprofile',
+//   async (_, thunkAPI) => {
+//     // const headers = { 'X-Zapi-Auth-Token': `Bearer ${cookies.get('accessToken')}` }
+//     // try {
+//     //     const response = await fetch(`${identity_url}/profile/${userId}`,
+//     //         // { headers }
+//     //     ) //sendRequest() function needs to replace this
+//     //     const data = await response.json()
+//     //     return data
+//     // } catch (error) {
+//     //     return thunkAPI.rejectWithValue(error.message)
+//     // }
+//   }
+// );
 
 export const getUserTodos = createAsyncThunk(
-  'user/getapis',
-  async (id, thunkAPI) => {
-    // const headers = { 'X-Zapi-Auth-Token': `Bearer ${cookies.get('accessToken')}` }
-    // try {
-    //     const response = await fetch(`${core_url}/api/dev-platform-data/${id}`,
-    //         // { headers }
-    //     )
-    //     const data = await response.json()
-    //     const apis = data?.data.apis
-    //     return apis
-    // } catch (error) {
-    //     return thunkAPI.rejectWithValue(error.message)
-    // }
+  'todo/getodos',
+  async (_, thunkAPI) => {
+    const headers = { 'Content-Type': 'application/json' };
+    try {
+      const response = await fetch(`${core_url}/todos/${userId}`, { headers });
+      const data = await response.json();
+      // console.log('todo data');
+      // console.log(data);
+      const todos = data.userTodos;
+      // console.log('todos');
+      // console.log(todos);
+
+      return todos;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
   }
 );
 
 export const getFavouriteTodos = createAsyncThunk(
-  'user/getsubscribed',
+  'todo/getfavourites',
   async (id, thunkAPI) => {
-    // const headers = { 'X-Zapi-Auth-Token': `Bearer ${cookies.get('accessToken')}` }
-    // try {
-    //   const response = await fetch(
-    //     `${core_url}/api/dev-platform-data/${id}`
-    //     // { headers }
-    //   );
-    //   const data = await response.json();
-    //   const subscribed = data?.data.userSubscriptions;
-    //   return subscribed;
-    // } catch (error) {
-    //   return thunkAPI.rejectWithValue(error.message);
-    // }
+    const headers = { 'Content-Type': 'application/json' };
+    try {
+      const response = await fetch(`${core_url}/todos/favourite/${id}`, {
+        headers,
+      });
+      const data = await response.json();
+      const todos = data?.data.todos;
+      return todos;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
   }
 );
 
-export const getSubscribedUsers = createAsyncThunk(
-  'user/getSubscribedUsers',
-  async (id, thunkAPI) => {
-    // const headers = { 'X-Zapi-Auth-Token': `Bearer ${cookies.get('accessToken')}` }
-    // try {
-    //   const response = await fetch(
-    //     `${core_url}/api/subscriptions/${id}`
-    //     // { headers }
-    //   );
-    //   const data = await response.json();
-    //   const user = data.data;
-    //   return user;
-    // } catch (error) {
-    //   return thunkAPI.rejectWithValue(error.message);
-    // }
-  }
-);
+// export const getSubscribedUsers = createAsyncThunk(
+//   'user/getSubscribedUsers',
+//   async (id, thunkAPI) => {
+//     // const headers = { 'X-Zapi-Auth-Token': `Bearer ${cookies.get('accessToken')}` }
+//     // try {
+//     //   const response = await fetch(
+//     //     `${core_url}/api/subscriptions/${id}`
+//     //     // { headers }
+//     //   );
+//     //   const data = await response.json();
+//     //   const user = data.data;
+//     //   return user;
+//     // } catch (error) {
+//     //   return thunkAPI.rejectWithValue(error.message);
+//     // }
+//   }
+// );
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   extraReducers: (builder) => {
-    builder.addCase(getUserProfile.pending, (state) => {
-      state.loading = 'pending';
-    }),
-      builder.addCase(getUserProfile.fulfilled, (state, action) => {
-        state.loading = 'fulfilled';
-        state.user = action.payload;
-      }),
-      builder.addCase(getUserProfile.rejected, (state, action) => {
-        state.loading = 'rejected';
-        state.error = action.payload;
-      }),
-      builder.addCase(getUserTodos.fulfilled, (state, action) => {
-        state.userApis = action.payload;
-      });
+    builder.addCase(getUserTodos.fulfilled, (state, action) => {
+      state.userTodos = action.payload
+  })
     builder.addCase(getFavouriteTodos.fulfilled, (state, action) => {
-      state.subscribedApis = action.payload;
+      state.favouriteTodos = action.payload
     });
-    builder.addCase(getSubscribedUsers.fulfilled, (state, action) => {
-      state.subscribedUsers = action.payload;
-    });
+    // builder.addCase(getSubscribedUsers.fulfilled, (state, action) => {
+    //   state.subscribedUsers = action.payload;
+    // });
   },
   reducers: {
     clearError: (state) => {
@@ -137,79 +127,54 @@ const userSlice = createSlice({
       state.user = initialState.user;
       localStorage.removeItem('todo_user');
     },
-    addEndpoint: (state, action) => {
-      const { apiId, name, method, route, description, headers, requestBody } =
+    addTodo: (state, action) => {
+      const { todoId, title, method, route, description, headers, requestBody } =
         action.payload;
-      const api = state.userApis.find((api) => api?.id === apiId);
-      let newEndpoint = {
-        name,
+      const todo = state.userTodos.find((todo) => todo?._id === todoId);
+      let newTodo = {
+        title,
         method,
         route,
         description,
         headers,
         requestBody,
       };
-      if (api) {
-        api.endpoints?.unshift(newEndpoint);
+      if (todo) {
+        todo.unshift(newTodo);
       }
     },
-    removeEndpoint: (state, action) => {
-      const { apiId, id } = action.payload;
-      const api = state.userApis.find((api) => api?.id === apiId);
-      if (api) {
-        api.endpoints = api.endpoints?.filter(
-          (endpoint) => endpoint?.id !== id
-        );
+    removeTodo: (state, action) => {
+      const { todoId, id } = action.payload;
+      const todo = state.userTodos.find((todo) => todo?._id === todoId);
+      if (todo) {
+        todo?.filter((todo) => todo?.id !== id);
       }
     },
-    editEndpoint: (state, action) => {
+    editTodo: (state, action) => {
       const {
-        apiId,
+        todoId,
         id,
-        name,
+        title,
         method,
         route,
         description,
         headers,
         requestBody,
       } = action.payload;
-      const api = state.userApis.find((api) => api?.id === apiId);
-      if (api) {
-        let endpoint = api.endpoints?.find((endpoint) => endpoint?.id === id);
-        if (endpoint) {
-          endpoint.name = name;
-          endpoint.method = method;
-          endpoint.route = route;
-          endpoint.description = description;
-          endpoint.headers = headers;
-          endpoint.requestBody = requestBody;
+      const todo = state.userTodos.find((todo) => todo?.id === todoId);
+      if (todo) {
+        let todo = todo?.find((t) => t?.id === id);
+        if (todo) {
+          todo.title = title;
+          todo.method = method;
+          todo.route = route;
+          todo.description = description;
+          todo.headers = headers;
+          todo.requestBody = requestBody;
         }
       }
     },
-    editAPI: (state, action) => {
-      const {
-        id,
-        description,
-        base_url,
-        about,
-        categoryId,
-        api_website,
-        term_of_use,
-        visibility,
-        read_me,
-      } = action.payload;
-      const api = state.userApis.find((api) => api?.id === id);
-      if (api) {
-        api.description = description;
-        api.base_url = base_url;
-        api.about = about;
-        api.categoryId = categoryId;
-        api.api_website = api_website;
-        api.term_of_use = term_of_use;
-        api.visibility = visibility;
-        api.read_me = read_me;
-      }
-    },
+
   },
 });
 
@@ -217,9 +182,8 @@ export const {
   clearError,
   login,
   logout,
-  addEndpoint,
-  removeEndpoint,
-  editEndpoint,
-  editAPI,
+  addTodo,
+  removeTodo,
+  editTodo,
 } = userSlice.actions;
 export default userSlice.reducer;
