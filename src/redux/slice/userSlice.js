@@ -1,23 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Cookies from 'universal-cookie';
 
-// import { UserProfileType, APIType, SubscriptionType, SubscribedUser } from "../../types";
 
 const core_url = 'https://todo-app-backend-n4ta.onrender.com/api';
-// const identity_url = import.meta.env.VITE_IDENTITY_URL;
 const cookies = new Cookies();
 const userId = cookies.get('userId');
-// const profileId = cookies.get("profileId")
 
-// interface UserState {
-//     user: UserProfileType | Object
-//     userTodos: Array<APIType>
-//     subscribedTodos: Array<SubscriptionType>
-//     subscribedUsers: Array<SubscribedUser>
-//     loading: "idle" | "pending" | "fulfilled" | "rejected"
-//     error?
-//     isLoggedIn: boolean
-// }
 
 const initialState = {
   user: {},
@@ -28,21 +16,7 @@ const initialState = {
   favouriteTodos: [],
 };
 
-// export const getUserProfile = createAsyncThunk(
-//   'user/getprofile',
-//   async (_, thunkAPI) => {
-//     // const headers = { 'X-Zapi-Auth-Token': `Bearer ${cookies.get('accessToken')}` }
-//     // try {
-//     //     const response = await fetch(`${identity_url}/profile/${userId}`,
-//     //         // { headers }
-//     //     ) //sendRequest() function needs to replace this
-//     //     const data = await response.json()
-//     //     return data
-//     // } catch (error) {
-//     //     return thunkAPI.rejectWithValue(error.message)
-//     // }
-//   }
-// );
+
 
 export const getUserTodos = createAsyncThunk(
   'todo/getodos',
@@ -51,11 +25,7 @@ export const getUserTodos = createAsyncThunk(
     try {
       const response = await fetch(`${core_url}/todos/${userId}`, { headers });
       const data = await response.json();
-      // console.log('todo data');
-      // console.log(data);
       const todos = data.userTodos;
-      // console.log('todos');
-      // console.log(todos);
 
       return todos;
     } catch (error) {
@@ -81,37 +51,34 @@ export const getFavouriteTodos = createAsyncThunk(
   }
 );
 
-// export const getSubscribedUsers = createAsyncThunk(
-//   'user/getSubscribedUsers',
-//   async (id, thunkAPI) => {
-//     // const headers = { 'X-Zapi-Auth-Token': `Bearer ${cookies.get('accessToken')}` }
-//     // try {
-//     //   const response = await fetch(
-//     //     `${core_url}/api/subscriptions/${id}`
-//     //     // { headers }
-//     //   );
-//     //   const data = await response.json();
-//     //   const user = data.data;
-//     //   return user;
-//     // } catch (error) {
-//     //   return thunkAPI.rejectWithValue(error.message);
-//     // }
-//   }
-// );
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   extraReducers: (builder) => {
-    builder.addCase(getUserTodos.fulfilled, (state, action) => {
-      state.userTodos = action.payload
-  })
-    builder.addCase(getFavouriteTodos.fulfilled, (state, action) => {
-      state.favouriteTodos = action.payload
+    builder
+      .addCase(getUserTodos.pending, (state) => {
+        state.loading = 'pending'; // Set loading state to 'pending' when the API call starts
+      })
+      .addCase(getUserTodos.fulfilled, (state, action) => {
+        state.userTodos = action.payload;
+        state.loading = 'fulfilled'; // Set loading state to 'fulfilled' when the API call is successful
+      })
+      .addCase(getUserTodos.rejected, (state) => {
+        state.loading = 'rejected'; // Set loading state to 'rejected' when the API call fails
+      })
+    .addCase(getFavouriteTodos.pending, (state) => {
+      state.loading = 'pending';
+    })
+    .addCase(getFavouriteTodos.fulfilled, (state, action) => {
+      state.loading = 'idle';
+      state.favouriteTodos = action.payload;
+    })
+    .addCase(getFavouriteTodos.rejected, (state, action) => {
+      state.loading = 'idle';
+      state.error = action.payload;
     });
-    // builder.addCase(getSubscribedUsers.fulfilled, (state, action) => {
-    //   state.subscribedUsers = action.payload;
-    // });
+
   },
   reducers: {
     clearError: (state) => {
@@ -127,53 +94,94 @@ const userSlice = createSlice({
       state.user = initialState.user;
       localStorage.removeItem('todo_user');
     },
+    removeAll: () => {
+      return initialState
+    },
     addTodo: (state, action) => {
-      const { todoId, title, method, route, description, headers, requestBody } =
-        action.payload;
-      const todo = state.userTodos.find((todo) => todo?._id === todoId);
-      let newTodo = {
-        title,
-        method,
-        route,
-        description,
-        headers,
-        requestBody,
-      };
-      if (todo) {
-        todo.unshift(newTodo);
+      // const newItem = {
+      //   // id: new Date().getTime().toString(),
+      //   title: action.payload,
+      //   description: action.payload,
+      //   // checked: false,
+      //   // editing: false,
+      // }
+
+      // state.userTodos.push(newItem)
+      state.userTodos.unshift(action.payload);
+
+      // return {
+      //   ...state,
+      //   userTodos: [...state.userTodos, newItem],
+      // }
+    },
+    deleteTodo: (state, action) => {
+      const newTodo = state.userTodos.filter(
+        (item) => item.id !== action.payload
+      )
+
+      state.userTodos = newTodo
+    },
+    editTodoTitle: (state, action) => {
+      return {
+        ...state,
+        userTodos: state.userTodos.map((todo) => {
+          if (todo.id === action.payload.id) {
+            return {
+              ...todo,
+              editing: !todo.editing,
+              title: action.payload.title,
+            }
+          }
+          return todo
+        }),
       }
     },
-    removeTodo: (state, action) => {
-      const { todoId, id } = action.payload;
-      const todo = state.userTodos.find((todo) => todo?._id === todoId);
-      if (todo) {
-        todo?.filter((todo) => todo?.id !== id);
+    toggleEdit: (state, action) => {
+      return {
+        ...state,
+        userTodos: state.userTodos.map((todo) => {
+          if (todo.id === action.payload) {
+            return { ...todo, editing: !todo.editing }
+          }
+          return { ...todo, editing: false }
+        }),
       }
     },
-    editTodo: (state, action) => {
-      const {
-        todoId,
-        id,
-        title,
-        method,
-        route,
-        description,
-        headers,
-        requestBody,
-      } = action.payload;
-      const todo = state.userTodos.find((todo) => todo?.id === todoId);
-      if (todo) {
-        let todo = todo?.find((t) => t?.id === id);
-        if (todo) {
-          todo.title = title;
-          todo.method = method;
-          todo.route = route;
-          todo.description = description;
-          todo.headers = headers;
-          todo.requestBody = requestBody;
-        }
+    checkTodo: (state, action) => {
+      return {
+        ...state,
+        todoList: state.todoList.map((todo) => {
+          if (todo.id === action.payload) {
+            return { ...todo, checked: !todo.checked }
+          }
+          return todo
+        }),
       }
     },
+    // removeTodo: (state, action) => {
+    //   const { todoId, id } = action.payload;
+    //   const todo = state.userTodos.find((todo) => todo?._id === todoId);
+    //   if (todo) {
+    //     todo.todos = todo.filter((todoItem) => todoItem?.id !== id);
+    //     state.userTodos = [...state.userTodos];
+    //   }
+    // },
+    // editTodo: (state, action) => {
+    //   const {
+    //     todoId,
+    //     id,
+    //     title,
+    //     description,
+    //   } = action.payload;
+    //   const todo = state.userTodos.find((todo) => todo?._id === todoId);
+    //   if (todo) {
+    //     let todo = todo?.find((t) => t?.id === id);
+    //     if (todo) {
+    //       todo.title = title;
+    //       todo.description = description;
+    //     }
+    //   }
+    // },
 
   },
 });
@@ -182,8 +190,11 @@ export const {
   clearError,
   login,
   logout,
+  removeAll,
   addTodo,
-  removeTodo,
-  editTodo,
+  deleteTodo,
+  editTodoTitle,
+  checkTodo,
+  toggleEdit,
 } = userSlice.actions;
 export default userSlice.reducer;

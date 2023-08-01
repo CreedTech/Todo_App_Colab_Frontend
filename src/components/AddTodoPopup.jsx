@@ -4,7 +4,7 @@ import { useContextProvider } from '../contexts/ContextProvider';
 import { useFormInputs } from '../hooks';
 import { useAppDispatch } from '../hooks';
 import axios from 'axios';
-import { addTodo } from '../redux/slice/todoSlice';
+import { addTodo } from '../redux/slice/userSlice';
 import { toast } from 'react-toastify';
 import { useState } from 'react';
 import Fallback from './Fallback';
