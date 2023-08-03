@@ -10,6 +10,7 @@ import Fallback from './Fallback';
 import { toast } from 'react-toastify';
 import Cookies from 'universal-cookie';
 import { login } from '../redux/slice/userSlice';
+import '../App.css'
 
 const Main = () => {
   const { isLoggedIn } = useAppSelector((state) => state.user);
@@ -73,7 +74,7 @@ const Main = () => {
 
     const newTask = {
       title: inputValue,
-      completed: false,
+      status: false,
       description: 'gvkhjblhv',
       userId,
     };
@@ -105,7 +106,7 @@ const Main = () => {
   const handleTaskCheckboxChange = (taskId) => {
     setTasks((prevTasks) =>
       Object.values(prevTasks).map((task) =>
-        task._id === taskId ? { ...task, completed: !task.completed } : task
+        task._id === taskId ? { ...task, status: !task.status } : task
       )
     );
   };
@@ -123,7 +124,7 @@ const Main = () => {
         }
       );
       const deleteTaskData = await response.json();
-      deleteTaskData.completed = true;
+      deleteTaskData.status = true;
       console.log(deleteTaskData);
       setTasks((prevTasks) =>
         Object.values(prevTasks).filter((task) => task._id !== taskId)
@@ -193,14 +194,14 @@ const Main = () => {
   // Mark all tasks as completed
   const handleCompleteAll = () => {
     setTasks((prevTasks) =>
-      Object.values(prevTasks).map((task) => ({ ...task, completed: true }))
+      Object.values(prevTasks).map((task) => ({ ...task, status: true }))
     );
   };
 
   // Clear completed tasks
   const handleClearCompleted = () => {
     setTasks((prevTasks) =>
-     Object.values(prevTasks).filter((task) => !task.completed)
+     Object.values(prevTasks).filter((task) => !task.status)
     );
   };
 
@@ -213,10 +214,10 @@ const Main = () => {
   const filteredTasks = isLoggedIn && Object.values(tasks).filter((task) => {
     if (filter === 'all') {
       return true;
-    } else if (filter === 'completed') {
-      return task.completed;
+    } else if (filter === 'status') {
+      return task.status;
     } else if (filter === 'uncompleted') {
-      return !task.completed;
+      return !task.status;
     }
     return true;
   });
@@ -258,13 +259,13 @@ const Main = () => {
                 <div className="flex flex-col justify-between my-4 mf:flex-row ">
                   <div className="flex items-center">
                   <BiCheckDouble className='pr-2' size={30}/>
-                  <p id="complete-all" className='text-xl' onClick={handleCompleteAll}>
+                  <p id="complete-all" className='text-xl cursor-pointer' onClick={handleCompleteAll}>
                     Complete all tasks
                   </p>
                   </div>
                   <div className='flex items-center'>
                   <GrClearOption className='pr-2' size={30}/>
-                  <p id="clear-all" className='text-lg' onClick={handleClearCompleted}>
+                  <p id="clear-all" className='text-lg cursor-pointer' onClick={handleClearCompleted}>
                     Delete comp tasks
                   </p>
                   </div>
@@ -280,12 +281,12 @@ const Main = () => {
                             id={`task-${task._id}`}
                             data-id={task._id}
                             className="custom-checkbox"
-                            checked={task.completed}
+                            checked={task.status}
                             onChange={() => handleTaskCheckboxChange(task._id)}
                           />
 
                           <div className="ml-4 text-sm font-semibold text-black">
-                            <label htmlFor={`task-${task._id}`}>
+                            <label htmlFor={`task-${task._id}`} style={task.status ? {textDecoration: 'line-through', color:'red'} : {}}>
                               {task.title}
                             </label>
                           </div>
@@ -331,7 +332,7 @@ const Main = () => {
                       <a
                         href="#"
                         id="com"
-                        onClick={() => handleFilterChange('completed')}
+                        onClick={() => handleFilterChange('status')}
                         className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-1.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
                       >
                         Completed
@@ -345,7 +346,7 @@ const Main = () => {
                       Completed:{' '}
                       <span id="c-count">
                         {
-                          Object.values(tasks).filter((task) => task.completed)
+                          Object.values(tasks).filter((task) => task.status)
                             .length
                         }
                       </span>
