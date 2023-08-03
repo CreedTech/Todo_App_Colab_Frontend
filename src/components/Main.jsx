@@ -1,7 +1,7 @@
 import { IoIosAddCircle } from 'react-icons/io';
 import { LiaTrashSolid } from 'react-icons/lia';
 import { LuEdit } from 'react-icons/lu';
-import { BiCheckDouble } from 'react-icons/Bi';
+import { BiCheckDouble } from 'react-icons/bi';
 import { GrClearOption } from 'react-icons/Gr';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +10,6 @@ import Fallback from './Fallback';
 import { toast } from 'react-toastify';
 import Cookies from 'universal-cookie';
 import { login } from '../redux/slice/userSlice';
-import '../App.css'
 
 const Main = () => {
   const { isLoggedIn } = useAppSelector((state) => state.user);
