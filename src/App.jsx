@@ -6,11 +6,11 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import { Suspense, useEffect } from 'react';
 import Fallback from './components/Fallback';
 import { useAppDispatch } from './hooks';
-import { getUserTodos, login } from './redux/slice/userSlice';
+import {  login } from './redux/slice/userSlice';
 import Cookies from 'universal-cookie';
-import { AddTodoPopup } from './components';
+import { AddTodoPopup, Navbar } from './components';
 import { useContextProvider } from './contexts/ContextProvider';
-import { useSelector } from 'react-redux';
+import UpdateTodoPopup from './components/UpdateTodoPopup';
 
 function App() {
   // const { isLoggedIn } = useAppSelector((store) => store.user);
@@ -18,7 +18,6 @@ function App() {
   const userId = cookies.get('userId');
   const dispatch = useAppDispatch();
   const { isClicked } = useContextProvider();
-  const userTodos = useSelector((state) => state.user.userTodos)
 
   useEffect(() => {
     const loginUser = () => {
@@ -32,14 +31,13 @@ function App() {
 
   useEffect(() => {
     if (userId === undefined) return;
-    dispatch(getUserTodos(userId));
-    // dispatch(getSubscribedApis(userId));
   }, [userId]);
   return (
     <>
       <div className="bg-gray-50 dark:bg-gray-900">
         <ToastContainer />
         <Suspense fallback={<Fallback />}>
+        <Navbar/>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/signup" element={<Signup />} />
@@ -53,6 +51,7 @@ function App() {
     <Transactions />
     <Footer /> */}
         {isClicked.addtodo && <AddTodoPopup />}
+        {isClicked.updatetodo && <UpdateTodoPopup />}
       </div>
     </>
   );

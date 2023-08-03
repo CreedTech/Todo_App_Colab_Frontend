@@ -1,88 +1,92 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Cookies from 'universal-cookie';
 
-
 const core_url = 'https://todo-app-backend-n4ta.onrender.com/api';
 const cookies = new Cookies();
 const userId = cookies.get('userId');
 
-
 const initialState = {
   user: {},
   loading: 'idle',
-  error: null,
+  // error: null,
   isLoggedIn: false,
-  userTodos: [],
-  favouriteTodos: [],
+  // favouriteTodos: [],
+  isError: false,
+  isSuccess: false,
+  isLoading: false,
+  message: '',
 };
 
+// export const getUserTodos = createAsyncThunk(
+//   'todo/getTodos',
+//   async (_, thunkAPI) => {
+//     const headers = { 'Content-Type': 'application/json' };
+//     try {
+//       const response = await fetch(`${core_url}/todos/${userId}`, { headers });
+//       const data = await response.json();
+//       const todos = data.userTodos;
+//       console.log(todos);
 
+//       return todos;
+//     } catch (error) {
+//       return thunkAPI.rejectWithValue(error.message);
+//     }
+//   }
+// );
 
-export const getUserTodos = createAsyncThunk(
-  'todo/getodos',
-  async (_, thunkAPI) => {
-    const headers = { 'Content-Type': 'application/json' };
-    try {
-      const response = await fetch(`${core_url}/todos/${userId}`, { headers });
-      const data = await response.json();
-      const todos = data.userTodos;
-
-      return todos;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  }
-);
-
-export const getFavouriteTodos = createAsyncThunk(
-  'todo/getfavourites',
-  async (id, thunkAPI) => {
-    const headers = { 'Content-Type': 'application/json' };
-    try {
-      const response = await fetch(`${core_url}/todos/favourite/${id}`, {
-        headers,
-      });
-      const data = await response.json();
-      const todos = data?.data.todos;
-      return todos;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
-    }
-  }
-);
-
+// export const getFavouriteTodos = createAsyncThunk(
+//   'todo/getfavourites',
+//   async (id, thunkAPI) => {
+//     const headers = { 'Content-Type': 'application/json' };
+//     try {
+//       const response = await fetch(`${core_url}/todos/favourite/${id}`, {
+//         headers,
+//       });
+//       const data = await response.json();
+//       const todos = data?.data.todos;
+//       return todos;
+//     } catch (error) {
+//       return thunkAPI.rejectWithValue(error.message);
+//     }
+//   }
+// );
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   extraReducers: (builder) => {
-    builder
-      .addCase(getUserTodos.pending, (state) => {
-        state.loading = 'pending'; // Set loading state to 'pending' when the API call starts
-      })
-      .addCase(getUserTodos.fulfilled, (state, action) => {
-        state.userTodos = action.payload;
-        state.loading = 'fulfilled'; // Set loading state to 'fulfilled' when the API call is successful
-      })
-      .addCase(getUserTodos.rejected, (state) => {
-        state.loading = 'rejected'; // Set loading state to 'rejected' when the API call fails
-      })
-    .addCase(getFavouriteTodos.pending, (state) => {
-      state.loading = 'pending';
-    })
-    .addCase(getFavouriteTodos.fulfilled, (state, action) => {
-      state.loading = 'idle';
-      state.favouriteTodos = action.payload;
-    })
-    .addCase(getFavouriteTodos.rejected, (state, action) => {
-      state.loading = 'idle';
-      state.error = action.payload;
-    });
-
+    // builder
+    //   .addCase(getUserTodos.pending, (state) => {
+    //     state.isLoading = true;
+    //     // state.loading = 'pending'; // Set loading state to 'pending' when the API call starts
+    //   })
+    //   .addCase(getUserTodos.fulfilled, (state, action) => {
+    //     // state.loading = 'fulfilled';
+    //     state.isLoading = false;
+    //     state.isSuccess = true; // Set loading state to 'fulfilled' when the API call is successful
+    //     state.userTodos = action.payload;
+    //   })
+    //   .addCase(getUserTodos.rejected, (state, action) => {
+    //     state.isLoading = false;
+    //     state.isError = true;
+    //     state.message = action.payload;
+    //     // state.loading = 'rejected'; // Set loading state to 'rejected' when the API call fails
+    //   })
+    //   .addCase(getFavouriteTodos.pending, (state) => {
+    //     state.loading = 'pending';
+    //   })
+    //   .addCase(getFavouriteTodos.fulfilled, (state, action) => {
+    //     state.loading = 'idle';
+    //     state.favouriteTodos = action.payload;
+    //   })
+    //   .addCase(getFavouriteTodos.rejected, (state, action) => {
+    //     state.loading = 'idle';
+    //     state.isError = action.payload;
+    //   });
   },
   reducers: {
-    clearError: (state) => {
-      state.error = null;
+    clearError: () => {
+      // state.error = null;
     },
     login: (state, action) => {
       state.user = action.payload;
@@ -94,8 +98,9 @@ const userSlice = createSlice({
       state.user = initialState.user;
       localStorage.removeItem('todo_user');
     },
+    reset: () => initialState,
     removeAll: () => {
-      return initialState
+      return initialState;
     },
     addTodo: (state, action) => {
       // const newItem = {
@@ -117,46 +122,46 @@ const userSlice = createSlice({
     deleteTodo: (state, action) => {
       const newTodo = state.userTodos.filter(
         (item) => item.id !== action.payload
-      )
+      );
 
-      state.userTodos = newTodo
+      state.userTodos = newTodo;
     },
-    editTodoTitle: (state, action) => {
+    updateTodo: (state, action) => {
       return {
         ...state,
         userTodos: state.userTodos.map((todo) => {
           if (todo.id === action.payload.id) {
             return {
               ...todo,
-              editing: !todo.editing,
-              title: action.payload.title,
-            }
+              // editing: !todo.editing,
+              // title: action.payload.title,
+            };
           }
-          return todo
+          return todo;
         }),
-      }
+      };
     },
     toggleEdit: (state, action) => {
       return {
         ...state,
         userTodos: state.userTodos.map((todo) => {
           if (todo.id === action.payload) {
-            return { ...todo, editing: !todo.editing }
+            return { ...todo, editing: !todo.editing };
           }
-          return { ...todo, editing: false }
+          return { ...todo, editing: false };
         }),
-      }
+      };
     },
     checkTodo: (state, action) => {
       return {
         ...state,
         todoList: state.todoList.map((todo) => {
           if (todo.id === action.payload) {
-            return { ...todo, checked: !todo.checked }
+            return { ...todo, checked: !todo.checked };
           }
-          return todo
+          return todo;
         }),
-      }
+      };
     },
     // removeTodo: (state, action) => {
     //   const { todoId, id } = action.payload;
@@ -182,19 +187,20 @@ const userSlice = createSlice({
     //     }
     //   }
     // },
-
   },
 });
 
 export const {
-  clearError,
+  // clearError,
   login,
   logout,
-  removeAll,
+  // removeAll,
   addTodo,
-  deleteTodo,
-  editTodoTitle,
-  checkTodo,
-  toggleEdit,
+  updateTodo,
+  // deleteTodo,
+  // editTodoTitle,
+  // checkTodo,
+  // toggleEdit,
+  reset,
 } = userSlice.actions;
 export default userSlice.reducer;

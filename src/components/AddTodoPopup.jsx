@@ -23,6 +23,8 @@ const AddTodoPopup = () => {
   const dispatch = useAppDispatch();
   const { triggerRefresh } = useContextProvider();
   const [loading, setLoading] = useState(false);
+  const [tasks, setTasks] = useState([]);
+  const [editTaskId, setEditTaskId] = useState(null);
   
 
   const handleSubmit = async (e) => {
@@ -60,6 +62,42 @@ const AddTodoPopup = () => {
       handleUnclicked();
     }
   };
+
+    // Update a task
+    const handleUpdateTask = async () => {
+      if (inputs.trim() === '') {
+        return;
+      }
+  
+      const updatedTask = {
+        title: inputs,
+        completed: false
+      };
+  
+      try {
+        const response = await fetch(`https://todo-app-backend-n4ta.onrender.com/todos/${editTaskId}`, {
+          method: 'PUT',
+          body: JSON.stringify(updatedTask),
+          headers: {
+            'Content-type': 'application/json; charset=UTF-8',
+          },
+        });
+        const updatedTaskData = await response.json();
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.id === editTaskId ? { ...task, title: updatedTaskData.title } : task
+          )
+        );
+        inputs('');
+        setEditTaskId(null);
+        toast.success('Task updated successfully');
+      } catch (error) {
+        console.log('Error updating task:', error);
+        toast.error('Error updating task');
+      }
+    };
+  
+  
   return (
     <>
       {loading && <Fallback />}

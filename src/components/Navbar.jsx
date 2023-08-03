@@ -18,7 +18,11 @@ const Navbar = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [toggleMenu, setToggleMenu] = useState(false);
+  // const [toggleMenu, setToggleMenu] = useState(false);
   const cookies = new Cookies();
+  const item = localStorage.getItem('todo_user');
+  const person = JSON.parse(item);
+  console.log(person.payload.email);
   // const [loading, setLoading] = useState(false);
 
   const handleLogOut = async () => {
@@ -55,6 +59,7 @@ const Navbar = () => {
         </Link>
       </div>
       <ul className="flex-row items-center justify-between flex-initial hidden text-white list-none md:flex">
+        <h1>Welcome {person && person.payload.email.split("@")[0]}</h1>
         {!isLoggedIn ? (
           <li className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]">
             {' '}

@@ -2,7 +2,7 @@ import  { createContext, useContext, useState } from 'react';
 
 const AppContext = createContext(null);
 
-const initialState = { login: false, addtodo: false };
+const initialState = { login: false, addtodo: false, updatetodo: false };
 
 // ContextProvider.propTypes = {
 //   children: React.ReactNode,
