@@ -34,7 +34,7 @@ const Main = () => {
       dispatch(login(user));
     };
     loginUser();
-  }, []);
+  }, [dispatch]);
 
   // useEffect(() => {
   //   if (userId === undefined) return;
@@ -230,7 +230,7 @@ const Main = () => {
     <div>
       {isLoggedIn ? (
         <>
-          <div className="flex items-center justify-center  flex-col">
+          <div className="flex flex-col items-center justify-center">
             <div className="flex items-center justify-center">
               <div className="h-auto p-4 px-12 bg-white rounded-lg md:w-[40rem] w-96">
                 <p className="text-xl font-semibold text-center text-black">
