@@ -1,8 +1,8 @@
 import { IoIosAddCircle } from 'react-icons/io';
 import { LiaTrashSolid } from 'react-icons/lia';
 import { LuEdit } from 'react-icons/lu';
-import { BiCheckDouble } from 'react-icons/bi';
-import { GrClearOption } from 'react-icons/Gr';
+import { BsCheckAll } from 'react-icons/bs';
+import { AiOutlineClear } from 'react-icons/ai';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import Fallback from './Fallback';
 import { toast } from 'react-toastify';
 import Cookies from 'universal-cookie';
 import { login } from '../redux/slice/userSlice';
+import '../App.css'
 
 const Main = () => {
   const { isLoggedIn } = useAppSelector((state) => state.user);
@@ -257,13 +258,13 @@ const Main = () => {
 
                 <div className="flex flex-col justify-between my-4 mf:flex-row ">
                   <div className="flex items-center">
-                  <BiCheckDouble className='pr-2' size={30}/>
+                  <BsCheckAll className='pr-2' size={30}/>
                   <p id="complete-all" className='text-xl cursor-pointer' onClick={handleCompleteAll}>
                     Complete all tasks
                   </p>
                   </div>
                   <div className='flex items-center'>
-                  <GrClearOption className='pr-2' size={30}/>
+                  <AiOutlineClear className='pr-2' size={30}/>
                   <p id="clear-all" className='text-lg cursor-pointer' onClick={handleClearCompleted}>
                     Delete comp tasks
                   </p>
@@ -311,35 +312,28 @@ const Main = () => {
                 <div className="filters">
                   <div className="dropdown">
                     <button className="dropbtn">Filter</button>
-                    <div className="dropdown-content flex justify-between">
+                    <div className="dropdown-content">
                       <a
                         href="#"
                         id="all"
-                        onClick={() => handleFilterChange('all')}
-                        className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-1.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
-                      >
+                        onClick={() => handleFilterChange('all')} >
                         All
                       </a>
                       <a
                         href="#"
                         id="rem"
-                        onClick={() => handleFilterChange('uncompleted')}
-                        className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-1.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
-                      >
+                        onClick={() => handleFilterChange('uncompleted')} >
                         Uncompleted
                       </a>
                       <a
                         href="#"
                         id="com"
-                        onClick={() => handleFilterChange('status')}
-                        className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-6 py-1.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
-                      >
+                        onClick={() => handleFilterChange('status')} >
                         Completed
                       </a>
                     </div>
                   </div>
 
-                  <div className='flex justify-around my-3'>
                   <div className="completed-task">
                     <p>
                       Completed:{' '}
@@ -359,7 +353,28 @@ const Main = () => {
                       </span>
                     </p>
                   </div>
-                 </div>
+
+                  {/* <div className='flex justify-around my-3'>
+                  <div className="completed-task">
+                    <p>
+                      Completed:{' '}
+                      <span id="c-count">
+                        {
+                          Object.values(tasks).filter((task) => task.status)
+                            .length
+                        }
+                      </span>
+                    </p>
+                  </div>
+                  <div className="remaining-task">
+                    <p>
+                      <span id="total-tasks">
+                        Total Tasks:{' '}
+                        <span id="tasks-counter">{tasks.length}</span>
+                      </span>
+                    </p>
+                  </div>
+                 </div> */}
                 </div>
               </div>
             </div>
